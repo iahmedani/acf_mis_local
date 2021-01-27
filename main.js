@@ -1850,7 +1850,7 @@ function creatWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     // console.log(e)
-    mainWindow = null
+  mainWindow = null
     app.quit();
   })
 }
