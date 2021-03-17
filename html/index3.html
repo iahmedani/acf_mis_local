@@ -118,6 +118,7 @@
   <link rel="import" href="api/newSyncAuthV3.html">
   <!-- <link rel="import" href="otp_add_followup_report.html"> -->
   <link rel="import" href="reports/otp_add_followup_report.html">
+  <link rel="import" href="reports/errorReport.html">
 
 </head>
 
@@ -417,6 +418,11 @@
 
                     <p>Stock Distribution</p>
                   </a></li>
+                <!-- <li class="nav-item"><a class="nav-link" href="#" id="errReports">
+                    <img src="dist/icons/icons8_move_stock.svg" width="25" alt="" srcset="">
+
+                    <p>Error Reports</p>
+                  </a></li> -->
 
 
               </ul>
@@ -1127,8 +1133,19 @@
   var InitNewSyncAuthV3 = require('./api/newSyncAuthV3').newSyncAuthV3;
   // var IniOtpAddFollowupReportV1 = require('./otp_add_followup_report').iniOtpAddFollowupReportV1;
   var IniOtpAddFollowupReportV1 = require('./reports/otp_add_followup_report').iniOtpAddFollowupReportV1;
+  // in upcomming version 
+  // var IniErrReports = require('./reports/errReport').iniErrReports;
   // var InitDefaulterv2 = require('./defaulterv2').initDefaulterv2;
 
+  function errReports_Template() {
+    // var content = document.querySelector('link[href="otp_add_followup_report.html"]');
+    var content = document.querySelector('link[href="reports/errorReport.html"]');
+    var template = content.import.querySelector('template');
+    var clone = document.importNode(template.content, true);
+    $('#jsContent').empty();
+    document.querySelector('#jsContent').appendChild(clone)
+    IniErrReports();
+  }
   function otp_add_followup_report_Template() {
     // var content = document.querySelector('link[href="otp_add_followup_report.html"]');
     var content = document.querySelector('link[href="reports/otp_add_followup_report.html"]');
@@ -1676,6 +1693,10 @@
   $('#otpAddFollowupReport').on('click', function () {
     otp_add_followup_report_Template();
   })
+  // in upcoming version
+  // $('#errReports').on('click', function () {
+  //   errReports_Template();
+  // })
 </script>
 <script>
   ipc.on('success', function (evt, result) {

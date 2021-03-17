@@ -34,26 +34,48 @@ module.exports = (ipcMain, knex, fs, sndMsg, async) => {
     }else{
       _tableName = '';
     }
+    console.log({_tableName})
 
     async.series({
       data: cb => {
-        knex(_tableName)
-          .where("p_name", "like", `%${filter.p_name}%`)
-          .where("site_village", "like", `%${filter.site_village}%`)
-          .where("reg_id", "like", `%${filter.reg_id}%`)
-          .where("province", "like", `%${filter.province}%`)
-          .where("district_name", "like", `%${filter.district_name}%`)
-          .where("uc_name", "like", `%${filter.uc_name}%`)
-          .where("tehsil_name", "like", `%${filter.tehsil_name}%`)
-          // .where("prog_type", "like", `%${filter.prog_type}%`)
-          .where({
-            is_deleted: 0
-          })
-          .whereRaw(`otp_id NOT IN (select otp_id from tblOtpExit where is_deleted = 0)`)
-          .limit(_limit)
-          .offset(_offset)
-          .then(result => cb(null, result))
-          .catch(e => cb(e));
+        if (filter.prog_type == 'sc') {
+          knex(_tableName)
+            .where("p_name", "like", `%${filter.p_name}%`)
+            // .where("site_village", "like", `%${filter.site_village}%`)
+            .where("reg_id", "like", `%${filter.reg_id}%`)
+            .where("province", "like", `%${filter.province}%`)
+            .where("district_name", "like", `%${filter.district_name}%`)
+            .where("uc_name", "like", `%${filter.uc_name}%`)
+            .where("tehsil_name", "like", `%${filter.tehsil_name}%`)
+            // .where("prog_type", "like", `%${filter.prog_type}%`)
+            .where({
+              is_deleted: 0
+            })
+            .whereRaw(`otp_id NOT IN (select otp_id from tblOtpExit where is_deleted = 0)`)
+            .limit(_limit)
+            .offset(_offset)
+            .then(result => cb(null, result))
+            .catch(e => cb(e));
+        } else {
+          
+          knex(_tableName)
+            .where("p_name", "like", `%${filter.p_name}%`)
+            .where("site_village", "like", `%${filter.site_village}%`)
+            .where("reg_id", "like", `%${filter.reg_id}%`)
+            .where("province", "like", `%${filter.province}%`)
+            .where("district_name", "like", `%${filter.district_name}%`)
+            .where("uc_name", "like", `%${filter.uc_name}%`)
+            .where("tehsil_name", "like", `%${filter.tehsil_name}%`)
+            // .where("prog_type", "like", `%${filter.prog_type}%`)
+            .where({
+              is_deleted: 0
+            })
+            .whereRaw(`otp_id NOT IN (select otp_id from tblOtpExit where is_deleted = 0)`)
+            .limit(_limit)
+            .offset(_offset)
+            .then(result => cb(null, result))
+            .catch(e => cb(e));
+        }
       },
       itemsCount: cb => {
         knex(_tableName)
@@ -81,7 +103,7 @@ module.exports = (ipcMain, knex, fs, sndMsg, async) => {
           err: e
         });
       } else {
-        // console.log(result)
+        console.log(result)
         event.sender.send('allOtpTest', {
           result
         })

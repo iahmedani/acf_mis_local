@@ -1,0 +1,42 @@
+<template>
+    <div class="col-sm-12">
+        <form >
+            <div class="form-row">
+                  <div class="form-group col-sm-2">
+                    <label for="entForm" class="form-label">Entry Form</label>
+                    <select name="entForm" id="entForm" class="form-control form-control-sm _ErFilter" required>
+                      <option selected value="">Select One</option>
+                      <option value="otpAdd">OTP Admission</option>
+                      <option value="otpNSC">NSC Admission</option>
+                      <option value="scrChildren">Children Screening</option>
+                      <option value="scrPlw">PLW Screening</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-sm-2">
+                    <label for="filterFields" class="form-label">Fields</label>
+                    <select name="filterFields" id="filterFields" class="form-control form-control-sm _ErFilter" required>
+                      <option selected value="">Select One</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-sm-2">
+                    <label for="filterType" class="form-label">Filter Type</label>
+                    <select name="filterType" id="filterType" class="form-control form-control-sm _ErFilter" required>
+                      <option selected value="">Select One</option>
+                      <option value="<=">&le; (less Than Equal)  </option>
+                      <option value="<">&lt; (less Than) </option>
+                      <option value=">="> &ge; (Greater Than Equal)  </option>
+                      <option value=">">&gt; (Greater Than)</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-sm-2">
+                    <label for="filValue" class="form-label">Value</label>
+                    <input type="number" id="filValue" class="form-control form-control-sm _ErFilter" >
+                  </div>
+                  <div class="form-group col-sm-2">
+                    <label for="expErrBtn" class="col-form-label ">Export to Excel</label>
+                    <button type="submit" id="expErrBtn" class="form-control form-control-sm btn-primary btn-sm btn" >Export</button>
+                  </div>
+            </div>
+          </form>
+    </div>
+</template>
