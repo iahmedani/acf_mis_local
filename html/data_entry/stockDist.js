@@ -8,7 +8,10 @@ module.exports.stockDist = function () {
     $('.prgChange').val("")
   })
   $( async function () {
-    await setFormDefualts('ddProgramType','ddProvince','ddDistrict','ddTehsil')
+    await setFormDefualts('ddProgramType', 'ddProvince', 'ddDistrict', 'ddTehsil')
+    setTimeout(() => {
+      $('#ddProgramType').trigger("change");
+    }, 100);
     // await appendItems('ddProvince','provinceList',false,'id','provinceName');
     await updatGeoElonChange('ddProvince','ddDistrict','ddTehsil', 'ddUC','ddHealthHouse' )
     $('#ddTehsil').on('change', function () {

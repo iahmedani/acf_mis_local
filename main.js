@@ -1264,6 +1264,7 @@ async function _firstRunDb(knex, Promise) {
     // await require('./migrations/20190128163134_Screening').up(knex, Promise);
     // await require('./migrations/v3').up(knex, Promise);
     await require('./migrations/v4')(knex);
+    fs.writeFileSync(`${process.env.APPDATA}/ACF MIS Local app/.dbcreated`,`${Date.now()} database created`,'utf8')
   } catch (error) {
     console.log(error)
     // await  require('./migrations/20190128163134_Screening').up(knex, Promise);    
@@ -2438,4 +2439,10 @@ require("./mainfunc/stockInUpdate")(ipcMain, knex, fs, clientMessages, async);
 // require('./mainfunc/v3_updates/v3_0_3');
 // require('./mainfunc/v3_updates/v3_0_8');
 // require('./mainfunc/v3_updates/v3_0_9');
-require('./mainfunc/v3_updates/v3_1_0')(app, dialog);
+
+// database update block
+fs.stat(`${process.env.APPDATA}/ACF MIS Local app/.dbcreated`, (e) => {
+  if (!e) {
+    require('./mainfunc/v3_updates/v3_1_0')(app, dialog);
+  }
+})
