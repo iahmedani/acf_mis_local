@@ -1,19 +1,17 @@
 const axios = require('axios');
-const knex = require('../../mainfunc/db');
+const knex = require('../../../mainfunc/db');
 const fs = require('fs');
 const _logger = require('electron-log');
-// _logger.transports.console.level = false;
+
+// const log = _logger.create('anotherInstance');
 
 var newErr = false;
 var intErr = false;
-var newChunkSize = 1;
 const logErrors = (error, data) => {
     var x = {error, data}
     x.serverResponse = error.precedingErrors.length ? JSON.stringify(error.precedingErrors) : JSON.stringify(error.originalError)
     x.data = data ? JSON.stringify(data) : '';
     _error = JSON.stringify(x)
-// _logger.transports.console.level = false
-
     _logger.error(_error)
     newErr = true
 }
@@ -22,8 +20,6 @@ const internalErr = (error, data) => {
     x.error = JSON.stringify(error)
     x.data = data ? JSON.stringify(data) : '';
     _error = JSON.stringify(x)
-// _logger.transports.console.level = false
-
     _logger.error(_error)
     intErr = true
 }
@@ -41,23 +37,17 @@ module.exports.newSyncAuthV3 = function () {
         client,
         mac
     } = JSON.parse(
-        fs.readFileSync(`${process.env.APPDATA}/ACF MIS Local app/config.json`, "utf8")
+        fs.readFileSync(`${process.env.APPDATA}/nims_aap/config.json`, "utf8")
     );
     var headers = {
         Authorization: `Bearer ${client} ${mac}`,
         'Content-Type': 'application/json'
     };
     var instance = axios.create({
-        // baseUrl:surl,
-        // timeout:10000,
-        // timeout = 600000,
         headers
     })
     let elProgress = $('#progress')
     let elInfo = $('#information')
-    // let counterT = $('#counterT')
-    // let counterUploaded = $('#counterUpd')
-    // let elNotuploaded = $('#notUploadedRecords')
 
 
     var uploadBtn = $('#uploadData')
@@ -67,14 +57,14 @@ module.exports.newSyncAuthV3 = function () {
         var upload_date = new Date().toJSON().split('T')[0]
         // console.log(data)
         try {
-            if (data.insert.length) {
+            if(data.insert.length){
                 for (datum of data.insert) {
                     await knex(table).update({
                         upload_status: update_val,
                         upload_date
                     }).where(column, '=', datum)
                 }
-            } else if (data.available.length) {
+            }else if(data.available.length){
                 for (datum of data.available) {
                     await knex(table).update({
                         upload_status: update_val,
@@ -82,18 +72,14 @@ module.exports.newSyncAuthV3 = function () {
                     }).where(column, '=', datum)
                 }
             }
-
+            
         } catch (error) {
-            // console.log(error)
             internalErr(error)
         }
 
     }
 
     async function uploadData(table, id_column, server_id_col, url, instance, title) {
-        console.log(`${table} running uploading`)
-        // _uploadedRecords = 0
-        // _notUploaded = 0
         elInfo.text(`Preparing Data - ${title}`)
         var _tData = await knex(table).where({
             upload_status: 0
@@ -106,29 +92,21 @@ module.exports.newSyncAuthV3 = function () {
                 newData.push(data);
             }
             elInfo.text(`Uploading Started - ${title}`);
-            // _totalRecords = newData.length;
-            // counterT.text(`Total records for uploading ${_totalRecords}`);
-            // counterUploaded.text(_uploadedRecords)
-            var _div = (newData.length > newChunkSize) ? Math.floor(newData.length / newChunkSize) : 1;
+            var _div = (newData.length > 1) ? Math.floor(newData.length / 1) : 1;
             var _sendData = splitToChunks(newData, _div);
             for (_data of _sendData) {
                 try {
                     var _x = await instance.post(url, _data)
-                    // console.log(_x)
-                    if(_x.data.code === 'EREQUEST'){
+                    console.log(_x)
+                    if (_x.data.code === "EREQUEST") {
                         logErrors(_x.data, _data)
-                        // _notUploaded = _notUploaded + newChunkSize
-                        // elNotuploaded.text(_notUploaded)
-                    } else if (Array.isArray(_x.data.insert) || Array.isArray(_x.data.available) && _x.data.length > 0) {
-                        elInfo.text(`Uploading finished, updating NMIS - ${title}`)
+                    }else if (Array.isArray(_x.data.insert) || Array.isArray(_x.data.available) && _x.data.length > 0) {
+                        elInfo.text(`Uploading finished, updating NIMS - ${title}`)
                         await updateData(table, id_column, _x.data, 1)
-                        elInfo.text(`NMIS updated - ${title}`)
-                        // _uploadedRecords= _uploadedRecords+newChunkSize;
-                        // counterUploaded.text(_uploadedRecords)
-                        
+                        elInfo.text(`NIMS updated - ${title}`)
                     }
                 } catch (error) {
-                    // console.log({error})
+                    // console.log(error)
                     internalErr(error, _sendData)
                 }
             }
@@ -147,7 +125,6 @@ module.exports.newSyncAuthV3 = function () {
                     upload_date
                 }).where(column, '=', datum)
             } catch (error) {
-                // console.log(error)
                 internalErr(error, data)
             }
         }
@@ -155,8 +132,6 @@ module.exports.newSyncAuthV3 = function () {
 
     async function uploadUpdatedData(table, id_column, server_id_col, url, instance, title) {
         elInfo.text(`Preparing updating data - ${title}`)
-        // _uploadedRecords = 0
-        // _notUploaded = 0
         var _tData = await knex(table).where({
             upload_status: 2
         }).whereNotNull('upload_date');
@@ -167,31 +142,27 @@ module.exports.newSyncAuthV3 = function () {
                 delete data[id_column];
                 newData.push(data);
             }
-            // _totalRecords = newData.length;
-            // counterT.text(`Total records for updating ${_totalRecords}`);
-            // counterUploaded.text(_uploadedRecords)
-            var _div = (newData.length > newChunkSize) ? Math.floor(newData.length / newChunkSize) : 1;
+            var _div = (newData.length > 1) ? Math.floor(newData.length / 1) : 1;
             var _sendData = splitToChunks(newData, _div);
             elInfo.text(`Uploading updated data Started - ${title}`);
             for (_data of _sendData) {
                 try {
                     var _x = await instance.put(url, _data)
+                    console.log(_x)
+
                     if (_x.data.code === "EREQUEST") {
                         logErrors(_x.data, _data);
-                        // _notUploaded = _notUploaded + newChunkSize
-                        // elNotuploaded.text(_notUploaded)
-                    }else if (Array.isArray(_x.data) && _x.data.length > 0) {
-
-                        elInfo.text(`Uploading updated data finished, updating NMIS - ${title}`)
+                    }else
+                     if (Array.isArray(_x.data) && _x.data.length > 0) {
+                        elInfo.text(`Uploading updated data finished, updating NIMS - ${title}`)
                         await updateData_updated(table, id_column, _x.data, 1)
-                        elInfo.text(`NMIS updated - ${title}`)
-                        // _uploadedRecords = _uploadedRecords + newChunkSize;
-                        // _remainingRecords = _totalRecords - _uploadedRecords
-                        // counterUploaded.text(_uploadedRecords + ' = ' + _remainingRecords)
+                         elInfo.text(`NIMS updated - ${title}`)
+                        _Errors.requestError = false;
+                         
                     }
                 } catch (error) {
-                    // console.log(error)
                     internalErr(error, _sendData)
+
                 }
             }
         } else {
@@ -200,10 +171,7 @@ module.exports.newSyncAuthV3 = function () {
     }
 
     async function uploadDataMultiple(table, id_column1, server_id_col1, id_column2, server_id_col2, url, instance, title) {
-        console.log(`${table} running uploading`)
         elInfo.text(`Preparing data - ${title}`)
-        // _uploadedRecords = 0
-        // _notUploaded = 0
         var _tData = await knex(table).where({
             upload_status: 0
         });
@@ -217,30 +185,27 @@ module.exports.newSyncAuthV3 = function () {
                 newData.push(data);
             }
             elInfo.text(`Uploading Started - ${title}`);
-            // _totalRecords = newData.length;
-            // counterT.text(`Total records for uploading ${_totalRecords}`);
-            // counterUploaded.text(_uploadedRecords)
-            var _div = (newData.length > newChunkSize) ? Math.floor(newData.length / newChunkSize) : 1;
+            var _div = (newData.length > 1) ? Math.floor(newData.length / 1) : 1;
             var _sendData = splitToChunks(newData, _div);
             // var _sendData = splitToChunks(newData, 30);
             for (_data of _sendData) {
                 try {
                     var _x = await instance.post(url, _data)
+                    console.log(_x)
+
                     if (_x.data.code === "EREQUEST") {
                         logErrors(_x.data, _data)
-                        // _notUploaded = _notUploaded + newChunkSize
-                        // elNotuploaded.text(_notUploaded)
-                    }else if (Array.isArray(_x.data.insert) || Array.isArray(_x.data.available) && _x.data.length > 0) {
-                        elInfo.text(`Uploading finished, updating NMIS - ${title}`)
+                    }else
+                    if (Array.isArray(_x.data.insert) || Array.isArray(_x.data.available) && _x.data.length > 0) {
+                        elInfo.text(`Uploading finished, updating NIMS - ${title}`)
                         await updateData(table, id_column1, _x.data, 1)
-                        elInfo.text(`NMIS Updated - ${title}`)
-                        // _uploadedRecords = _uploadedRecords + newChunkSize;
-                        // _remainingRecords = _totalRecords - _uploadedRecords
-                        // counterUploaded.text(_uploadedRecords + ' = ' + _remainingRecords)
+                        elInfo.text(`NIMS Updated - ${title}`)
+                        _Errors.requestError = false;
+
                     }
                 } catch (error) {
-                    // console.log({error})
                     internalErr(error, _sendData)
+
                 }
             }
         } else {
@@ -250,9 +215,6 @@ module.exports.newSyncAuthV3 = function () {
 
     async function uploadUpdatedDataMultiple(table, id_column1, server_id_col1, id_column2, server_id_col2, url, instance, title) {
         elInfo.text(`Preparing updated data - ${title}`)
-        // _uploadedRecords = 0
-        // _notUploaded=0
-
         var _tData = await knex(table).where({
             upload_status: 2
         });
@@ -266,29 +228,27 @@ module.exports.newSyncAuthV3 = function () {
                 newData.push(data);
             }
             elInfo.text(`Uploading updated data started - ${title}`);
-            // _totalRecords = newData.length;
-            // counterT.text(`Total records for update ${_totalRecords}`);
-            // counterUploaded.text(_uploadedRecords)
-            var _div = (newData.length > newChunkSize) ? Math.floor(newData.length / newChunkSize) : 1;
+            var _div = (newData.length > 1) ? Math.floor(newData.length / 1) : 1;
             var _sendData = splitToChunks(newData, _div);
             for (_data of _sendData) {
                 try {
                     var _x = await instance.put(url, _data)
+                    console.log(_x)
+
                     if (_x.data.code === "EREQUEST") {
                         logErrors(_x.data, _data)
-                        // _notUploaded = _notUploaded + newChunkSize
-                        // elNotuploaded.text(_notUploaded)
-                    }else if (Array.isArray(_x.data) && _x.data.length > 0) {
-                        elInfo.text(`Uploading updated data finished, updating NMIS - ${title}`)
+                    }else
+                     if (Array.isArray(_x.data) && _x.data.length > 0) {
+                        _Errors.register = false
+                        elInfo.text(`Uploading updated data finished, updating NIMS - ${title}`)
                         await updateData_updated(table, id_column1, _x.data, 1)
-                        elInfo.text(`NMIS Updated - ${title}`)
-                        // _uploadedRecords = _uploadedRecords + newChunkSize;
-                        // _remainingRecords = _totalRecords - _uploadedRecords
-                        // counterUploaded.text(_uploadedRecords + ' = ' + _remainingRecords)
+                         elInfo.text(`NIMS Updated - ${title}`)
+                         _Errors.requestError = false;
+
                     }
                 } catch (error) {
-                    // console.log(error)
                     internalErr(error, _sendData)
+
                 }
             }
         } else {
@@ -301,34 +261,30 @@ module.exports.newSyncAuthV3 = function () {
         console.log(url)
         try {
             var _data = await instance.get(url);
+            console.log(_data)
+
             if (_data.data.code === "EREQUEST") {
                 logErrors(_data.data)
             }else
-             if (Array.isArray(_data.data) && _data.data.length > 0) {
-                _Errors.register = false
-
-                // console.log(_data)
-                elInfo.text(`Updating NMIS - ${title}`)
+            if (Array.isArray(_data.data) && _data.data.length > 0) {
+                elInfo.text(`Updating NIMS - ${title}`)
                 for (datum of _data.data) {
-                    // console.log(datum)
-                    // var _id = datum[id_column];
-                    // delete datum[id_column]
                     delete datum.isActive;
                     try {
                         var _check = await knex(table).where(id_column, datum[id_column]);
                         if (_check.length == 0) {
                             await knex(table).insert(datum);
-                            elInfo.text(`NMIS updated - ${title}`)
+                            elInfo.text(`NIMS updated - ${title}`)
                         }
                     } catch (error) {
-                        // console.log(error)
                         internalErr(error)
+
                     }
                 }
             }
         } catch (error) {
-            // console.log({error})
             internalErr(error)
+
         }
 
     }
@@ -338,107 +294,54 @@ module.exports.newSyncAuthV3 = function () {
         console.log(url)
         try {
             var _data = await instance.get(url);
+            console.log(_data)
+
             if (_data.data.code === "EREQUEST") {
                 logErrors(_data.data)
-            }else if (Array.isArray(_data.data) && _data.data.length > 0) {
-                _Errors.register = true
-
-                // console.log(_data)
-                elInfo.text(`Updating NMIS - ${title}`)
+            }else
+            if (Array.isArray(_data.data) && _data.data.length > 0) {
+                _Errors.register = false
+                elInfo.text(`Updating NIMS - ${title}`)
                 for (datum of _data.data) {
-                    // console.log(datum)
-                    // var _id = datum[id_column];
-                    // delete datum[id_column]
-                    // delete datum.isActive;
+
                     try {
                         var _check = await knex(table).where(id_column, datum[id_column]);
                         // console.log(_check)
                         if (_check.length == 0) {
                             await knex(table).insert(datum);
-                            elInfo.text(`NMIS updated - ${title}`)
-                        } else if (_check.length == 1 && datum[colName] != _check[0][colName]) {
+                            elInfo.text(`NIMS updated - ${title}`)
+                        }else if(_check.length == 1 && datum[colName] != _check[0][colName] ){
                             await knex(table).where(id_column, datum[id_column]).update(colName, datum[colName]);
-                            elInfo.text(`NMIS updated - ${title}`)
+                            elInfo.text(`NIMS updated - ${title}`)
                             // console.log('getAndUpdateBasicData1')
-                        } else if (datum.isActive != _check[0].isActive) {
+                        }else if (datum.isActive != _check[0].isActive){
                             await knex(table).where(id_column, datum[id_column]).update('isActive', datum.isActive);
-                            elInfo.text(`NMIS updated - ${title}`)
+                            elInfo.text(`NIMS updated - ${title}`)
                         }
                     } catch (error) {
-                        // console.log(error)
                         internalErr(error)
+
                     }
                 }
             }
         } catch (error) {
-            // console.log(error)
-            // _Errors.requestError = true;
             internalErr(error)
-        }
 
-    }
-    async function getAndUpdateBasicData2(table, id_column, colName, url, instance, title) {
-        console.log(`${table} table update request Initiated`)
-        elInfo.text(`Requesting server for data - ${title}`)
-        // console.log(url)
-        try {
-            var _data = await instance.get(url);
-            // console.log({_data})
-            if (_data.data.code === "EREQUEST") {
-                logErrors(_data.data)
-            }else if (Array.isArray(_data.data) && _data.data.length > 0) {
-                _Errors.register = false 
-                // console.log(_data)
-                elInfo.text(`Updating NMIS - ${title}`)
-                for (datum of _data.data) {
-                    // console.log(datum)
-                    // var _id = datum[id_column];
-                    // delete datum[id_column]
-                    // delete datum.isActive;
-                    try {
-                        var _check = await knex(table).where(id_column, datum[id_column]);
-                        // console.log(_check)
-                        if (_check.length == 0) {
-                            await knex(table).insert(datum);
-                            elInfo.text(`NMIS updated - ${title}`)
-
-                        } else if (_check.length == 1 && datum[colName] == _check[0][colName] && datum.isActive == _check[0].isActive) {
-                            var _newDatum = datum;
-                            delete _newDatum[id_column]
-                            await knex(table).where(id_column, _check[0][id_column]).update(_newDatum);
-                            elInfo.text(`NMIS updated - ${title}`)
-                        } else if (_check.length == 1 && datum[colName] != _check[0][colName]) {
-
-                            await knex(table).where(id_column, _check[0][id_column]).update(colName, datum[colName]);
-                            elInfo.text(`NMIS updated - ${title}`)
-                            // console.log('getAndUpdateBasicData1')
-                        } else if (datum.isActive != _check[0].isActive) {
-                            await knex(table).where(id_column, _check[0][id_column]).update('isActive', datum.isActive);
-                            elInfo.text(`NMIS updated - ${title}`)
-                        }
-                    } catch (error) {
-                        // console.log({error})
-                        internalErr(error)
-                    }
-                }
-            }
-        } catch (error) {
-            // console.log({error})
-            internalErr(error)
         }
 
     }
     uploadBtn.on('click', async () => {
         var surl = await knex("tblConfig");
         surl = surl[0].value + '/api3';
-        console.log(surl)
         elProgress.show();
         updateBtn.attr('disabled', true)
         uploadBtn.attr('disabled', true)
         console.log(surl)
 
         try {
-            // Scr Children block
+            var isRegister = await instance.post(`${surl}/checkRegistration`);
+            if (isRegister.data.registered) {
+                // Scr Children block
             await uploadData('tblScrChildren', 'ch_scr_id', 'client_scr_ch_id', `${surl}/newScrBulk`, instance, 'Children Screening');
             await uploadUpdatedData('tblScrChildren', 'ch_scr_id', 'client_scr_ch_id', `${surl}/newScrBulk`, instance, 'Children Screening');
             // Scr Plw block          
@@ -484,37 +387,45 @@ module.exports.newSyncAuthV3 = function () {
             // Stock In Block
             await uploadData('tblStock', 'id', 'client_stockIn_id', `${surl}/stockInBulk`, instance, 'Stock In');
             await uploadUpdatedData('tblStock', 'id', 'client_stockIn_id', `${surl}/stockInBulk`, instance, 'Stock In');
-
-
-            elProgress.hide();
-            if(_Errors.register || _Errors.requestError){
-
-
-                Swal.fire({
-                    type: 'error',
-                    title: 'NMIS Syncronization',
-                    text: _Errors.register ? 'NMIS is not registred' : 'Unable to contact with Server'
-                })
-
-            }else{
+                elProgress.hide();
+                console.log({newErr })
                 
+            if(newErr){
                 Swal.fire({
-                    type: 'success',
-                    title: 'NMIS Syncronization',
+                    icon:'error',
+                    title: 'NIMS Syncronization',
+                    text:'Unable to contact with Server/ request error'
+                })
+            }else{
+                Swal.fire({
+                    icon:'success',
+                    title: 'NIMS Syncronization',
                     text: 'Successfully uploaded'
                 })
             }
+            } else {
+                elProgress.hide();
+
+                Swal.fire({
+                        icon:'error',
+                        title: 'NIMS Syncronization',
+                        text: 'NIMS is not registred'
+                })
+            }
+            
+
             // elProgress.hide();
+            
             updateBtn.attr('disabled', false)
             uploadBtn.attr('disabled', false)
 
         } catch (error) {
-            // console.log({error})
+            internalErr(error)
             elProgress.hide();
             Swal.fire({
-                type: 'error',
-                title: 'NMIS Syncronization',
-                text: _Errors.register ? 'NMIS is not registred' : 'Unable to contact with Server'
+                icon:'error',
+                title: 'NIMS Syncronization',
+                text: `Internal Error, please share ${process.env.APPDATA}/nims_aap/log.log with admin`
             })
             updateBtn.attr('disabled', false)
             uploadBtn.attr('disabled', false)
@@ -531,43 +442,56 @@ module.exports.newSyncAuthV3 = function () {
         uploadBtn.attr('disabled', true)
 
         try {
-            await getAndUpdateBasicData2('tblGeoProvince', 'id', 'provinceName', `${surl}/getProvince`, instance, 'Province(s)')            
-            await getAndUpdateBasicData2('tblGeoDistrict', 'id', 'districtName', `${surl}/getDistrict`, instance, 'District(s)')
-            await getAndUpdateBasicData2('tblGeoTehsil', 'id', 'tehsilName', `${surl}/getTehsil`, instance, 'Tehsil(s)')
-            await getAndUpdateBasicData2('tblGeoUC', 'id', 'ucName', `${surl}/getUC`, instance, 'Union Council(s)')
-            await getAndUpdateBasicData2('tblGeoNutSite', 'id', 'siteName', `${surl}/getSite`, instance, 'Health House(s)')
-            await getAndUpdateBasicData('tblCommodity', 'id', `${surl}/getItems`, instance, 'Commodities')
-            var _config = await instance.post(`${surl}/getConfig`);
-            // console.log(_config)
-            await knex('tblConfig').update({
-                value: _config.data[0].value
-            }).whereNot('value', _config.data[0].value)
-            elProgress.hide();
-            // console.log({_Errors})
-            if(_Errors.register || _Errors.requestError){
-                Swal.fire({
-                    type: 'error',
-                    title: 'NMIS Syncronization error',
-                    text: _Errors.register ? 'NMIS is not registred' : 'Unable to contact with Server'
-                })
-            }else{
+            var isRegister = await instance.post(`${surl}/checkRegistration`);
+            if (isRegister.data.registered) {
+                await getAndUpdateBasicData1('tblGeoProvince', 'id', 'provinceName', `${surl}/getProvince`, instance, 'Province(s)')
+                await getAndUpdateBasicData1('tblGeoDistrict', 'id', 'districtName', `${surl}/getDistrict`, instance, 'District(s)')
+                await getAndUpdateBasicData1('tblGeoTehsil', 'id', 'tehsilName', `${surl}/getTehsil`, instance, 'Tehsil(s)')
+                await getAndUpdateBasicData1('tblGeoUC', 'id', 'ucName', `${surl}/getUC`, instance, 'Union Council(s)')
+                await getAndUpdateBasicData1('tblGeoNutSite', 'id', 'siteName', `${surl}/getSite`, instance, 'Health House(s)')
+                await getAndUpdateBasicData1('tblCommodity', 'id', 'item_name', `${surl}/getItems`, instance, 'Commodities')
+                var _config = await instance.post(`${surl}/getConfig`);
+                console.log(_config)
+                await knex('tblConfig').update({
+                    value: _config.data[0].value
+                }).whereNot('value', _config.data[0].value)
+                elProgress.hide();
+                console.log({newErr})
+                if(newErr){
+                    Swal.fire({
+                        icon:'error',
+                        title: 'NIMS Syncronization',
+                        text:'Unable to contact with Server/ request error'
+                    })
+                    newErr = false
+                } else {
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'NIMS Syncronization',
+                        text: 'Successfully downloaded'
+                    })
+                }
+            } else {
+                elProgress.hide();
 
                 Swal.fire({
-                    type: 'success',
-                    title: 'NMIS Syncronization',
-                    text: 'Successfully downloaded'
-                })
+                    icon:'error',
+                    title: 'NIMS Syncronization',
+                    text: 'NIMS is not registred'
+            })
             }
             updateBtn.attr('disabled', false)
             uploadBtn.attr('disabled', false)
         } catch (error) {
-            // console.log({error})
+            internalErr(error)
             elProgress.hide();
             Swal.fire({
-                type: 'error',
-                title: 'NMIS Syncronization error',
-                text: _Errors.register ? 'NMIS is not registred' : 'Unable to contact with Server'
+                icon:'error',
+                title: 'NIMS Syncronization error',
+                text: `Internal Error, please share ${process.env.APPDATA}/nims_aap/log.log with admin`
             })
+            newErr = false
             updateBtn.attr('disabled', false)
             uploadBtn.attr('disabled', false)
         }
@@ -582,19 +506,19 @@ module.exports.newSyncAuthV3 = function () {
     }
 
     async function scr30(data, instance, surl) {
-        var _data = splitToChunks(data, Math.floor(data.length / 20));
+        var _data = splitToChunks(data, Math.floor(data.length / 1));
 
 
         for (data of _data) {
             // data.client_id = client;
             // data.client_scr_ch_id = data.ch_scr_id;
             // delete data.ch_scr_id;
-            // console.log(data);
+            console.log(data);
             try {
                 var _testData = await instance.post(`${surl}/newChScr`, data)
-                // console.log(_testData)
+                console.log(_testData)
             } catch (error) {
-                // console.log(error)
+                console.log(error)
             }
             // instance.post('/newScrChild1', )
         }

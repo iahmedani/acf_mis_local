@@ -110,9 +110,10 @@ module.exports.initGrid = function () {
     _sumVals('mnpnewb', 'mnpnewg', 'mnp_boys', 'mnp_girls')
   })
   // mnp followup
+  
   mnp.on('change', function(){
     _sumVals('mnpb', 'mnpg', 'followup_boys', 'followup_girls')
-    $('#total_followup').val( ($('#followup_boys').val() + $('#followup_girls').val()))
+    $('#total_followup').val( (parseInt($('#followup_boys').val()) + parseInt($('#followup_girls').val())))
   })
   // mnp exits
   mnpexit.on('change', function(){

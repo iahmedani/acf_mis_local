@@ -130,7 +130,7 @@ module.exports.initScrChildrenReport = function () {
             // console.log(result)
             putSummaryDataToTable('scrChildNewSum', result.summary)
             createSingleEntryTable('scrChildNewSingle', result.single, fullTextCh, colNameCh)
-
+            
           })
           .catch(e => {
             // console.log('error occured during summary table creation')

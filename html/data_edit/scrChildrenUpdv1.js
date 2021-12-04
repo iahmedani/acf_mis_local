@@ -973,12 +973,12 @@ module.exports.initScrChildrenUpd = function () {
   // mnp followup
   mnp.on('change', function(){
     _sumVals('mnpb', 'mnpg', 'followup_boys', 'followup_girls')
-    $('#total_followup').val( ($('#followup_boys').val() + $('#followup_girls').val()))
+    $('#total_followup').val( (parseInt($('#followup_boys').val()) + parseInt($('#followup_girls').val())))
   })
   // mnp exits
   mnpexit.on('change', function(){
     _sumVals('mnpexitb', 'mnpexitg', 'exits_boys', 'exits_girls')
-    $('#total_exits').val( ($('#exits_boys').val() + $('#exits_girls').val()))
+    $('#total_exits').val( (parseInt($('#exits_boys').val()) + parseInt($('#exits_girls').val())))
   })
   // Deworming
   deworm.on('change', function(){
