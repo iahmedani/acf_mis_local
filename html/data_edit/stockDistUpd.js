@@ -226,7 +226,7 @@ module.exports.stockDistUpd = function () {
       var timeDiff = Math.abs(date2.getTime() - date1.getTime());
       var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
       diffDays = (args.item.upload_status == 1 && args.item.upload_date != null) ? diffDays : 0;
-      if (diffDays < 10000) {
+      if (1 == 1) {
 
         var getData = args.item;
         $("#updateStockDistModalId").modal("show");
