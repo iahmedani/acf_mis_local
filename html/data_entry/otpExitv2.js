@@ -267,6 +267,7 @@ module.exports.initOtpExit = function () {
                 <option value="medical_transfer">Medical Transfer</option>
                 <option value="transfer_to_otp">Transfer to OTP</option>
                 <option value="moved_out">Moved Out</option>
+                <option value="moved_out_to_other_programe">Moved Out to other proragme</option>
                 <option value="other">Other</option>
       `)
     } else {
@@ -278,6 +279,7 @@ module.exports.initOtpExit = function () {
       <option value="medical_transfer">Medical Transfer</option>
       <option value="transfer_out_to_other_otp">Transfer Out to other OTP</option>
       <option value="moved_out">Moved Out</option>
+      <option value="moved_out_to_other_programe">Moved Out to other proragme</option>
       <option value="other">Other</option>`
       $('#exit_reason').append(_otp);
     }
