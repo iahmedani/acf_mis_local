@@ -115,7 +115,7 @@ module.exports = (ipcMain, knex, fs, sndMsg, async) => {
   ipcMain.on('deleteOtpAdd', (event, otp_id) => {
     knex('tblOtpExit')
       .where({
-        otp_id
+        otp_id, is_deleted:0
       })
       .then(result => {
         if (result.length > 0) {
