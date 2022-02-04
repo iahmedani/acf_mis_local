@@ -302,7 +302,7 @@ module.exports.initOtpFollowUpEdit = function () {
             message: function (value, item) {
               return "Please check next next followup date"
             },
-            param: ['2019-01-01', ['2021-12-31']]
+            param: ['2019-01-01', '2025-12-31']
           },
         },
         {

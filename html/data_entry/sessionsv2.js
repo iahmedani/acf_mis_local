@@ -357,7 +357,7 @@ module.exports.initSessionsV2 = function () {
             message: function (value, item) {
               return "Please check next session date"
             },
-            param: ['2019-01-01', ['2021-12-31']]
+            param: ['2019-01-01', '2025-12-31']
           },
           width: 50,
         }, {
