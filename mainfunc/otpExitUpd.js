@@ -13,25 +13,30 @@ module.exports = (ipcMain, knex, fs, sndMsg, async) => {
 
     if(filter.prog_type == 'sc'){
       _tableName = 'allNSCExits'
-      whereField = `site_name`
+      // whereField = `site_name`
     }else if (filter.prog_type == 'otp'){
       _tableName = 'allOtpExits'
-      whereField = `uc_name`
+      // whereField = `uc_name`
     }else{
       _tableName = '';
     }
 
     async.series({
-        data: cb => {
-          knex(_tableName)
-            .where("p_name", "like", `%${filter.p_name}%`)
-            // .where("site_village", "like", `%${filter.site_village}%`)
-            .where("reg_id", "like", `%${filter.reg_id}%`)
-            .where("province", "like", `%${filter.province}%`)
-            .where("district_name", "like", `%${filter.district_name}%`)
-            // .where("uc_name", "like", `%${filter.uc_name}%`)
-            .where(whereField, "like", `%${filter[whereField]}%`)
-            .where("tehsil_name", "like", `%${filter.tehsil_name}%`)
+      data: cb => {
+        knex(_tableName)
+          .where("p_name", "like", `%${filter.p_name}%`)
+          // .where("site_village", "like", `%${filter.site_village}%`)
+          .where("reg_id", "like", `%${filter.reg_id}%`)
+          .where("province", "like", `%${filter.province}%`)
+          .where("district_name", "like", `%${filter.district_name}%`)
+          // .where("uc_name", "like", `%${filter.uc_name}%`)
+          // .where(whereField, "like", `%${filter[whereField]}%`)
+          .where("tehsil_name", "like", `%${filter.tehsil_name}%`)
+          .where((builder => {
+            if (filter.prog_type == 'otp') {
+              builder.where("uc_name", "like", `%${filter.uc_name}%`)
+            }
+          }))
             // .where("prog_type", "like", `%${filter.prog_type}%`)
             // .where('report_month', 'like', `%${filter.report_month}%`)
 
@@ -51,7 +56,11 @@ module.exports = (ipcMain, knex, fs, sndMsg, async) => {
             .where("province", "like", `%${filter.province}%`)
             .where("district_name", "like", `%${filter.district_name}%`)
             // .where("uc_name", "like", `%${filter.uc_name}%`)
-            .where(whereField, "like", `%${filter[whereField]}%`)
+            .where((builder => {
+              if (filter.prog_type == 'otp') {
+                builder.where("uc_name", "like", `%${filter.uc_name}%`)
+              }
+            }))
             .where("tehsil_name", "like", `%${filter.tehsil_name}%`)
             // .where("prog_type", "like", `%${filter.prog_type}%`)
             .where({
