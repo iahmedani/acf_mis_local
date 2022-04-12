@@ -898,6 +898,7 @@ FROM   [main].[tblOtpAdd]
        INNER JOIN [main].[v_geo_tehsil] ON [main].[tblOtpAdd].[tehsil_id] = [main].[v_geo_tehsil].[tehsil_id]
 WHERE  [tblOtpExit].[is_deleted] = 0 AND [tblOtpAdd].[prog_type] = 'sc' and ([main].[tblOtpAdd].[site_id] is null or [main].[tblOtpAdd].[site_id] = '')`
            var v4026Msg = 'updated NSC view for edit version 4.0.26' 
+           _checkVer = 4026;
            await chekAndExecuteUpdate(_checkVer, currentVersion, v4026Update, v4026Msg);
            
     } catch (error) {
