@@ -853,7 +853,53 @@ update tblOtpAdd
                 where v_geo.site_id = tblOtpAdd.site_id
               ) and tblOtpAdd.district_id is null;`
            var v4012Msg = `updated table with version 4.0.12 requirements`
-              await chekAndExecuteUpdate(_checkVer, currentVersion, v4012Upadte, v4012Msg);
+           await chekAndExecuteUpdate(_checkVer, currentVersion, v4012Upadte, v4012Msg);
+           var v4026Update = `DROP VIEW IF EXISTS [main].[allNSCExits];
+           CREATE VIEW [main].[allNSCExits]
+            AS SELECT 
+       [main].[tblOtpAdd].[site_id], 
+       [main].[tblOtpAdd].[p_name], 
+       [main].[tblOtpAdd].[reg_id], 
+       [main].[tblOtpAdd].[site_village], 
+       [main].[tblOtpAdd].[prog_type], 
+       [main].[v_geo_active].[province_id], 
+       [main].[v_geo_active].[province], 
+       [main].[v_geo_active].[district_id], 
+       [main].[v_geo_active].[district_name], 
+       [main].[v_geo_active].[tehsil_id], 
+       [main].[v_geo_active].[tehsil_name], 
+       [main].[v_geo_active].[uc_id], 
+       [main].[v_geo_active].[uc_name], 
+       [main].[v_geo_active].[site_name], 
+       [tblOtpExit].*
+FROM   [main].[tblOtpAdd]
+       INNER JOIN [main].[tblOtpExit] ON [main].[tblOtpAdd].[otp_id] = [main].[tblOtpExit].[otp_id]
+       INNER JOIN [main].[v_geo_active] ON [main].[tblOtpAdd].[site_id] = [main].[v_geo_active].[site_id]
+WHERE  [tblOtpExit].[is_deleted] = 0 and [main].[tblOtpAdd].[prog_type] = 'sc'
+UNION ALL
+SELECT 
+       [main].[tblOtpAdd].[site_id], 
+       [main].[tblOtpAdd].[p_name], 
+       [main].[tblOtpAdd].[reg_id], 
+       [main].[tblOtpAdd].[site_village], 
+       [main].[tblOtpAdd].[prog_type], 
+       [main].[v_geo_tehsil].[province_id], 
+       [main].[v_geo_tehsil].[province_name] AS [province], 
+       [main].[v_geo_tehsil].[district_id], 
+       [main].[v_geo_tehsil].[district_name], 
+       [main].[v_geo_tehsil].[tehsil_id], 
+       [main].[v_geo_tehsil].[tehsil_name], 
+       '' AS [uc_id], 
+       '' AS [uc_name], 
+       '' AS [site_name], 
+       [tblOtpExit].*
+FROM   [main].[tblOtpAdd]
+       INNER JOIN [main].[tblOtpExit] ON [main].[tblOtpAdd].[otp_id] = [main].[tblOtpExit].[otp_id]
+       INNER JOIN [main].[v_geo_tehsil] ON [main].[tblOtpAdd].[tehsil_id] = [main].[v_geo_tehsil].[tehsil_id]
+WHERE  [tblOtpExit].[is_deleted] = 0 AND [tblOtpAdd].[prog_type] = 'sc' and ([main].[tblOtpAdd].[site_id] is null or [main].[tblOtpAdd].[site_id] = '')`
+           var v4026Msg = 'updated NSC view for edit version 4.0.26' 
+           await chekAndExecuteUpdate(_checkVer, currentVersion, v4026Update, v4026Msg);
+           
     } catch (error) {
 
         console.log(error)

@@ -202,7 +202,7 @@ module.exports.initOtpExitEditV2 = function () {
     return new Promise((resolve, reject) => {
       ipc.send("allOtpExit", filter);
       ipc.on("allOtpExit", (e, result) => {
-        // console.log(result);
+        console.log(result);
         var s = {
           data: result.result.data,
           itemsCount: result.result.itemsCount[0].total
