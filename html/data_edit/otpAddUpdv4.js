@@ -830,15 +830,16 @@ module.exports.initOtpAddUpdV2 = function () {
     } else if (prog == 'otp') {
       $("#ent_reason").children('option:not(:first)').remove();
       $("#ent_reason").append(`
-        <option value="no_prv_pro">New Admission</option>
-        <option value="relapse">Relapse</option>
-        <option value="return_def">Return After Defaulter</option>
-        <option value="in-patient_refusal">In-patient Refusal</option>
-        <option value="transfer_in_from_nsc">Transfer in from NSC</option>
-        <option value="tranfer_in_other_otp">Transfer in<small>From other OTP</small></option>
-        <option value="tranfer_in_from_sfp">Transfer in<small>From TSFP</small></option>
-        <option value="moved_in">Moved In</option>
-        <option value="other">Other</option>
+      <option value="no_prv_pro">New Admission</option>
+      <option value="relapse">Relapse</option>
+      <option value="return_def">Return After Defaulter</option>
+      <option value="in-patient_refusal">In-patient Refusal</option>
+      <option value="transfer_in_from_nsc">Transfer in from NSC</option>
+      <option value="return_from_medical_transfer">Return from Medical Transfer</option>
+      <option value="tranfer_in_other_otp">Transfer in<small>From other OTP</small></option>
+      <option value="tranfer_in_from_sfp">Transfer in<small>From TSFP</small></option>
+      <option value="moved_in">Moved In</option>
+      <option value="other">Other</option>
         `);
       $("#ref_type")
         .children("option:not(:first)")

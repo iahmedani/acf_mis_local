@@ -321,6 +321,16 @@ module.exports.sessionsReport = () => {
                 data: "lactating"
               },
               {
+                title: "PLW",
+                data: "plw"
+              },
+              {
+                title: 'Other Female',
+                render: function (data, type,row) {
+                  return (row.female_participants - (row.pragnent + row.lactating + row.plw))
+                }
+              },
+              {
                 title: "New Participants",
                 data: "new_participants"
               },
@@ -418,6 +428,17 @@ module.exports.sessionsReport = () => {
               {
                 title: "Lactating",
                 data: "lactating"
+              }
+              ,
+              {
+                title: "PLW",
+                data: "plw"
+              },
+              {
+                title: 'Other Female',
+                render: function (data, type,row) {
+                  return (row.female_participants - (row.pragnent + row.lactating + row.plw))
+                }
               },
               {
                 title: "New Participants",

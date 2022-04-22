@@ -537,6 +537,17 @@ module.exports.initSessionsV2 = function () {
           filtering: false
         },
         {
+          name: "plw",
+          title: "PLW",
+          width: 50,
+          type: "number",
+          validate: {
+            validator: 'min',
+            param: 0
+          },
+          filtering: false
+        },
+        {
           name: "new_participants",
           title: "New Part:",
           width: 50,

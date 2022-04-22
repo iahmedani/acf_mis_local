@@ -900,6 +900,65 @@ WHERE  [tblOtpExit].[is_deleted] = 0 AND [tblOtpAdd].[prog_type] = 'sc' and ([ma
            var v4026Msg = 'updated NSC view for edit version 4.0.26' 
            _checkVer = 4026;
            await chekAndExecuteUpdate(_checkVer, currentVersion, v4026Update, v4026Msg);
+           var v4027Update = `PRAGMA [main].legacy_alter_table = 'on';
+
+           PRAGMA [main].foreign_keys = 'off';
+           
+           SAVEPOINT [sqlite_expert_apply_design_transaction];
+           
+           ALTER TABLE [main].[tblSessions] RENAME TO [_sqliteexpert_temp_table_1];
+           
+           CREATE TABLE [main].[tblSessions](
+             [session_id] char(36), 
+             [session_id_old] integer, 
+             [site_id] integer, 
+             [client_id] varchar(255), 
+             [session_date] date, 
+             [session_type] varchar(255), 
+             [male_participants] INTEGER, 
+             [female_participants] INTEGER, 
+             [session_location] varchar(255), 
+             [upload_status] integer, 
+             [created_at] datetime, 
+             [updated_at] datetime, 
+             [old_participants] INTEGER, 
+             [new_participants] INTEGER, 
+             [username] VARCHAR(50), 
+             [org_name] VARCHAR(50), 
+             [project_name] VARCHAR(50), 
+             [pragnent] INT, 
+             [lactating] INT, 
+             [is_deleted] INTEGER(1) NOT NULL DEFAULT 0, 
+             [remarks] VARCHAR NOT NULL DEFAULT "N/A", 
+             [CHS_id] VARCHAR, 
+             [CHW_id] VARCHAR, 
+             [upload_date] DATE, 
+             [prog_type] varchar(10), 
+             [total_session] INTEGER DEFAULT 0, 
+             [ind_session] INTEGER DEFAULT 0, 
+             [grp_sessions] INTEGER DEFAULT 0, 
+             [uc_id] INTEGER, 
+             [province_id] INTEGER, 
+             [district_id] INTEGER, 
+             [tehsil_id] INTEGER, 
+             [mtmg] INTEGER, 
+             [ftfg] INTEGER, 
+             [plw] INTEGER);
+           
+           INSERT INTO [main].[tblSessions]([rowid], [session_id], [session_id_old], [site_id], [client_id], [session_date], [session_type], [male_participants], [female_participants], [session_location], [upload_status], [created_at], [updated_at], [old_participants], [new_participants], [username], [org_name], [project_name], [pragnent], [lactating], [is_deleted], [remarks], [CHS_id], [CHW_id], [upload_date], [prog_type], [total_session], [ind_session], [grp_sessions], [uc_id], [province_id], [district_id], [tehsil_id], [mtmg], [ftfg])
+           SELECT [rowid], [session_id], [session_id_old], [site_id], [client_id], [session_date], [session_type], [male_participants], [female_participants], [session_location], [upload_status], [created_at], [updated_at], [old_participants], [new_participants], [username], [org_name], [project_name], [pragnent], [lactating], [is_deleted], [remarks], [CHS_id], [CHW_id], [upload_date], [prog_type], [total_session], [ind_session], [grp_sessions], [uc_id], [province_id], [district_id], [tehsil_id], [mtmg], [ftfg]
+           FROM [main].[_sqliteexpert_temp_table_1];
+           
+           DROP TABLE IF EXISTS [main].[_sqliteexpert_temp_table_1];
+           
+           RELEASE [sqlite_expert_apply_design_transaction];
+           
+           PRAGMA [main].foreign_keys = 'on';
+           
+           PRAGMA [main].legacy_alter_table = 'off';`
+           var v4027Msg = 'added plw in session and added return after medical transfer for otp add' 
+           _checkVer = 4027;
+           await chekAndExecuteUpdate(_checkVer, currentVersion, v4027Update, v4027Msg);
            
     } catch (error) {
 

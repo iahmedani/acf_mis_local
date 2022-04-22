@@ -155,6 +155,7 @@ module.exports.initOtpAdd = function () {
         <option value="return_def">Return After Defaulter</option>
         <option value="in-patient_refusal">In-patient Refusal</option>
         <option value="transfer_in_from_nsc">Transfer in from NSC</option>
+        <option value="return_from_medical_transfer">Return from Medical Transfer</option>
         <option value="tranfer_in_other_otp">Transfer in<small>From other OTP</small></option>
         <option value="tranfer_in_from_sfp">Transfer in<small>From TSFP</small></option>
         <option value="moved_in">Moved In</option>
