@@ -408,7 +408,8 @@ function exitUpdDataSave(event, data, client) {
     other_com_qty: (data.exit_other_com_qty) ? data.exit_other_com_qty : '',
     muac: data.exit_muac,
     status: data.exit_reason,
-    curr_date: data.exit_date
+    curr_date: data.exit_date,
+    upload_status:2
   }
 
   knex('tblOtpExit')
@@ -735,7 +736,8 @@ function otpExitAddDataSave(event, data, client) {
     other_com_qty: (data.exit_other_com_qty) ? data.exit_other_com_qty : '',
     muac: data.exit_muac,
     status: data.exit_reason,
-    curr_date: data.exit_date
+    curr_date: data.exit_date,
+    upload_status:0
   }
   knex('tblOtpExit')
     .insert(data)
