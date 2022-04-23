@@ -206,7 +206,7 @@ module.exports.newSyncAuthV3 = function () {
         // _notUploaded = 0
         var _tData = await knex(table).where({
             upload_status: 0
-        });
+        }).orWhere({upload_status: null});
         if (_tData.length) {
             var newData = [];
             for (data of _tData) {
@@ -447,6 +447,9 @@ module.exports.newSyncAuthV3 = function () {
             //  OtpFollowup Block
             await uploadDataMultiple('tblOtpFollowup', 'followup_id', 'client_followup_id', 'otp_id', 'client_otp_id', `${surl}/otpFollowupBulk`, instance, 'Followup');
             await uploadUpdatedDataMultiple('tblOtpFollowup', 'followup_id', 'client_followup_id', 'otp_id', 'client_otp_id', `${surl}/otpFollowupBulk`, instance, 'Followup');
+            //  OtpFollowup Block
+            // await uploadData('tblOtpFollowup', 'followup_id', 'client_followup_id', `${surl}/otpFollowupBulk`, instance, 'Followup');
+            // await uploadUpdatedData('tblOtpFollowup', 'followup_id', 'client_followup_id',`${surl}/otpFollowupBulk`, instance, 'Followup');
 
             // Stock Out
             await uploadData('tblSiteStock', 'stock_out_id', 'client_stock_out_id', `${surl}/stockOutBulk`, instance, 'Stock Out');
