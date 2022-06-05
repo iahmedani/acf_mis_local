@@ -959,7 +959,12 @@ WHERE  [tblOtpExit].[is_deleted] = 0 AND [tblOtpAdd].[prog_type] = 'sc' and ([ma
            var v4027Msg = 'added plw in session and added return after medical transfer for otp add' 
            _checkVer = 4027;
            await chekAndExecuteUpdate(_checkVer, currentVersion, v4027Update, v4027Msg);
-           
+           var v4029Update = `update tblOtpAdd set upload_status=2 where is_deleted=1;
+           update tblOtpExit set upload_status=2 where is_deleted=1;
+           update tblOtpFollowup set upload_status=2 where is_deleted=1;`
+           var v4029Msg = 'fixed bug where deleted followup, exits and admisions were not getting updated' 
+           _checkVer = 4029;
+           await chekAndExecuteUpdate(_checkVer, currentVersion, v4029Update, v4029Msg);
     } catch (error) {
 
         console.log(error)

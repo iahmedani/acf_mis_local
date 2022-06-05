@@ -98,7 +98,8 @@ module.exports = (ipcMain, knex, fs, sndMsg, async) => {
               exit_id: item.exit_id
             })
             .update({
-              is_deleted: 1
+              is_deleted: 1,
+              upload_status:2
             })
             .then(result => {
               if (result) {

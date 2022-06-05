@@ -128,7 +128,8 @@ module.exports = (ipcMain, knex, fs, sndMsg, async) => {
                   otp_id: otp_id
                 })
                 .update({
-                  is_deleted: 1
+                  is_deleted: 1,
+                  upload_status:2
                 })
                 .then(result => cb(null, result))
                 .catch(e => cb(e));
@@ -150,7 +151,8 @@ module.exports = (ipcMain, knex, fs, sndMsg, async) => {
                   otp_id: otp_id
                 })
                 .update({
-                  is_deleted: 1
+                  is_deleted: 1,
+                  upload_status:2
                 })
                 .then(result => cb(null, result))
                 .catch(e => cb(e));
